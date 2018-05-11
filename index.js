@@ -41,11 +41,18 @@ const { ERRORS } = require('./lib/constants')
 
  * @param {string} [必须] configs.wxMessageToken     微信消息通知 token
  * @param {number} [可选] configs.wxLoginExpires     微信登录态有效期（单位：秒）
+ *
+ * @param {number} [可选] configs.redis              redis 缓存配置信息
+ * @param {number} [可选] configs.redis.host         redis 主机名
+ * @param {number} [可选] configs.redis.port         redis 端口
+ * @param {number} [可选] configs.redis.password     redis 密码
+ * @param {number} [可选] configs.redis.db           redis 数据库
+ *
  */
 module.exports = function init (options) {
     // 检查配置项
-    const { rootPathname, useQcloudLogin, cos, serverHost, tunnelServerUrl, tunnelSignatureKey, qcloudAppId, qcloudSecretId, qcloudSecretKey, wxMessageToken } = options
-    if ([rootPathname, useQcloudLogin, cos, serverHost, tunnelServerUrl, tunnelSignatureKey, qcloudAppId, qcloudSecretId, qcloudSecretKey, wxMessageToken].some(v => v === undefined)) throw new Error(ERRORS.ERR_INIT_SDK_LOST_CONFIG)
+    const { rootPathname, useQcloudLogin, cos, serverHost, tunnelServerUrl, tunnelSignatureKey, qcloudAppId, qcloudSecretId, qcloudSecretKey, wxMessageToken, redis} = options
+    if ([rootPathname, useQcloudLogin, cos, serverHost, tunnelServerUrl, tunnelSignatureKey, qcloudAppId, qcloudSecretId, qcloudSecretKey, wxMessageToken, redis].some(v => v === undefined)) throw new Error(ERRORS.ERR_INIT_SDK_LOST_CONFIG)
 
     const { region, fileBucket, uploadFolder } = cos
     if ([region, fileBucket, uploadFolder].some(v => v === undefined)) throw new Error(ERRORS.ERR_INIT_SDK_LOST_CONFIG)
@@ -53,6 +60,11 @@ module.exports = function init (options) {
     if (options.mysql) {
         const { host, port, user, db, pass } = options.mysql
         if ([host, port, user, db, pass].some(v => v === undefined)) throw new Error(ERRORS.ERR_INIT_SDK_LOST_CONFIG)
+    }
+
+    if (options.redis) {
+        const { host, port, password, db } = options.redis
+        if ([host, port, password, db].some(v => v === undefined)) throw new Error(ERRORS.ERR_INIT_SDK_LOST_CONFIG)
     }
 
     // 初始化配置
